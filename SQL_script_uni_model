@@ -1,0 +1,118 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema university_structure_model
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema university_structure_model
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `university_structure_model` DEFAULT CHARACTER SET utf8 ;
+USE `university_structure_model` ;
+
+-- -----------------------------------------------------
+-- Table `university_structure_model`.`students`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `university_structure_model`.`students` (
+  `student_id` SMALLINT NOT NULL AUTO_INCREMENT,
+  `first_name` VARCHAR(45) NOT NULL,
+  `last_name` VARCHAR(45) NOT NULL,
+  `phone_number` VARCHAR(25) NOT NULL,
+  `email` VARCHAR(50) NOT NULL,
+  `date_registered` DATE NOT NULL,
+  PRIMARY KEY (`student_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `university_structure_model`.`lecturers`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `university_structure_model`.`lecturers` (
+  `lecturer_id` SMALLINT NOT NULL AUTO_INCREMENT,
+  `lecturer_name` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`lecturer_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `university_structure_model`.`courses`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `university_structure_model`.`courses` (
+  `course_id` SMALLINT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(20) NOT NULL,
+  `tags` VARCHAR(50) NOT NULL,
+  `price` DECIMAL(5,2) NOT NULL,
+  `lecturer_id` SMALLINT NOT NULL,
+  PRIMARY KEY (`course_id`),
+  INDEX `fk_courses_lecturers1_idx` (`lecturer_id` ASC) VISIBLE,
+  CONSTRAINT `fk_courses_lecturers1`
+    FOREIGN KEY (`lecturer_id`)
+    REFERENCES `university_structure_model`.`lecturers` (`lecturer_id`)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `university_structure_model`.`enrollments`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `university_structure_model`.`enrollments` (
+  `student_id` SMALLINT NOT NULL,
+  `course_id` SMALLINT NOT NULL,
+  `date` DATETIME NOT NULL,
+  `price` DECIMAL(5,2) NOT NULL,
+  INDEX `fk_enrollments_students_idx` (`student_id` ASC) VISIBLE,
+  INDEX `fk_enrollments_courses1_idx` (`course_id` ASC) VISIBLE,
+  PRIMARY KEY (`student_id`, `course_id`),
+  CONSTRAINT `fk_enrollments_students`
+    FOREIGN KEY (`student_id`)
+    REFERENCES `university_structure_model`.`students` (`student_id`)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_enrollments_courses`
+    FOREIGN KEY (`course_id`)
+    REFERENCES `university_structure_model`.`courses` (`course_id`)
+    ON DELETE NO ACTION
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `university_structure_model`.`course_tag`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `university_structure_model`.`course_tag` (
+  `course_id` SMALLINT NOT NULL AUTO_INCREMENT,
+  `tag_id` SMALLINT NOT NULL,
+  PRIMARY KEY (`course_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `university_structure_model`.`tags`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `university_structure_model`.`tags` (
+  `courses_id` SMALLINT NOT NULL,
+  `tag_id` SMALLINT NOT NULL,
+  INDEX `fk_course_modules_courses2_idx` (`courses_id` ASC) VISIBLE,
+  INDEX `fk_course_modules_modules1_idx` (`tag_id` ASC) VISIBLE,
+  PRIMARY KEY (`courses_id`, `tag_id`),
+  CONSTRAINT `fk_course_modules_courses2`
+    FOREIGN KEY (`courses_id`)
+    REFERENCES `university_structure_model`.`courses` (`course_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_course_modules_modules1`
+    FOREIGN KEY (`tag_id`)
+    REFERENCES `university_structure_model`.`course_tag` (`course_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
