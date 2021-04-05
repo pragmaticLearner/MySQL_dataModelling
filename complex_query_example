@@ -1,0 +1,15 @@
+-- A complex query example using the relational databases given on the SQL mastery course for 'coding with Mosh'
+
+
+
+SELECT 
+	invoice_id,
+    client_id,
+    payment_total,
+    invoice_date,
+    due_date
+FROM invoices
+WHERE client_id IN (
+	SELECT DISTINCT client_id
+    FROM invoices
+)
