@@ -1,0 +1,41 @@
+-- SQL script comparing and understanding performance queries
+-- Dummy data with 1010 rows taken from 'coding with Mosh- SQL mastery course'
+
+-- Normal example query: get all customers who have more than 1000 points
+
+SELECT *
+FROM customers
+WHERE points > 1000
+
+-- And it produces results: 
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+>> 1	Babara	MacCaffrey	1986-03-28	    781-932-9754	    0 Sage Terrace	          Waltham	            MA	    2273
+>> 3	Freddi	Boagey	    1985-02-07	    719-724-7869	    251 Springs Junction	    Colorado Springs	  CO	    2967
+>> 5	Clemmie	Betchley	  1973-11-07		  NULL              5 Spohn Circle	          Arlington	          TX	    3675
+>>                              .
+>>                              . 
+>>                              .
+
+-- Using EXPLAIN keyword to diagnose performance of query:
+
+
+EXPLAIN
+SELECT *
+FROM customers
+WHERE points > 1000
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+>>> id,  select_type,  table,      partitions,     type,     possible_keys,        key,        key_len,        ref,        rows,         filtered,         Extra
+>>> 1    SIMPLE	       customers	NULL             ALL			 NULL                	 NULL        NULL            NULL        1010	         33.33	           Using where
+
+
+-- Now the same query using indexing for performance efficiency
+
+EXPLAIN SELECT * FROM customers WHERE points > 1000;
+CREATE INDEX idx_points ON customers (points);
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+>>> id,  select_type,   table,      partitions,     type,     possible_keys,       key,         key_len,        ref,       rows,         filtered,         Extra
+>>>	1	   SIMPLE	        customers		NULL            range	    idx_points	         idx_points	  4		            NULL       529	         100.00	           Using where; Using index
+
+
+-- By using indexing, the query has eliminated the need to go through 481 extra rows. (1010 - 529 = 481).
